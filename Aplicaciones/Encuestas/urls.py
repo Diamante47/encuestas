@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
 from . import views
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('encuesta/<int:encuesta_id>/llenar/', views.compartir_encuesta, name='compartir_encuesta'),
     path('encuesta/<int:encuesta_id>/resultados/', views.resultados_encuesta, name='resultados_encuesta'),
     path('seleccionar_encuesta/', views.seleccionar_encuesta, name='seleccionar_encuesta'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]
