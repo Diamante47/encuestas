@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-import django
+
 
 def main():
     """Run administrative tasks."""
@@ -21,17 +21,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'encuestas.settings')  # Reemplaza 'encuestas.settings' con tu archivo de configuración
-django.setup()
 
-from django.contrib.auth.models import User
-
-username = 'nuevo_superusuario'
-email = 'superusuario@example.com'
-password = 'contraseña_segura'
-
-if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username=username, email=email, password=password)
-    print(f'Superusuario "{username}" creado exitosamente.')
-else:
-    print(f'El superusuario "{username}" ya existe.')
