@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 def inicio(request):
     return render(request, 'inicio.html')
 
-@login_required
 def encuestas(request):
     return render(request, 'crear_encuesta.html')
 

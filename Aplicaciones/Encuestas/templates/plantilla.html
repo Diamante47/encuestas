@@ -39,7 +39,14 @@
             <li><a href="{% url 'crear_encuesta' %}">Crear Encuesta</a></li>
             <li><a href="{% url 'editar_encuesta_list' %}">Mis Encuestas</a></li>
             <li><a href="{% url 'seleccionar_encuesta' %}">Ver Resultados</a></li>
-            <li><a href="{% url 'logout' %}">Salir</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 0;">
+                        Salir
+                    </button>
+                </form>
+            </li>
         </ul>
     </nav>
 
