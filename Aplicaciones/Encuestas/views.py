@@ -35,7 +35,7 @@ def crear_encuesta(request):
                         if opcion_texto:
                             Respuesta.objects.create(pregunta=pregunta, texto=opcion_texto)
 
-            return redirect('lista_encuestas')
+            return redirect('seleccionar_encuesta')
     else:
         encuesta_form = EncuestaForm()
 
@@ -73,7 +73,6 @@ def lista_encuestas(request):
     encuestas = Encuesta.objects.all()
     return render(request, 'lista_encuestas.html', {'encuestas': encuestas})
 
-@login_required
 def gracias(request):
     return render(request, 'gracias.html')
 
