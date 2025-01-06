@@ -1,0 +1,163 @@
+{% extends "plantilla.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Encuesta</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Personalización de bordes y colores */
+        .card {
+            border: 1px solid #d6d6d6;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .card-header {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: bold;
+            border-bottom: 1px solid #d6d6d6;
+        }
+
+        .pregunta {
+            border: 1px solid #dee2e6;
+            background-color: #fdfdfd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .pregunta h3 {
+            color: #6c757d;
+        }
+
+        body {
+            background-color: #f7f7f7;
+        }
+
+        h1 {
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Crear Encuesta</h1>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Datos de la Encuesta -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    Datos de la Encuesta
+                </div>
+                <div class="card-body">
+                    {{ encuesta_form.as_p }}
+                </div>
+            </div>
+
+            <!-- Preguntas -->
+            <div id="preguntas-container" class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    Preguntas
+                </div>
+                <div class="card-body">
+                    {% for pregunta in preguntas %}
+                        <div id="pregunta_{{ forloop.counter0 }}" class="pregunta">
+                            <h3>Pregunta {{ forloop.counter }}</h3>
+                            <label for="pregunta_{{ forloop.counter0 }}" class="form-label">Texto de la pregunta:</label>
+                            <input type="text" name="pregunta_{{ forloop.counter0 }}" value="{{ pregunta.texto }}" class="form-control" required>
+                            <input type="hidden" name="pregunta_{{ forloop.counter0 }}_id" value="{{ pregunta.id }}">
+
+                            <div id="opciones_pregunta_{{ forloop.counter0 }}" class="mt-3">
+                                <h4 class="h6">Opciones</h4>
+                                {% for opcion in pregunta.respuestas.all %}
+                                    <div class="mb-2">
+                                        <label for="pregunta_{{ forloop.parentloop.counter0 }}_opcion_{{ forloop.counter0 }}" class="form-label">Opción {{ forloop.counter }}:</label>
+                                        <input type="text" name="pregunta_{{ forloop.parentloop.counter0 }}_opcion_{{ forloop.counter0 }}" value="{{ opcion.texto }}" class="form-control" required>
+                                        <input type="hidden" name="pregunta_{{ forloop.parentloop.counter0 }}_opcion_{{ forloop.counter0 }}_id" value="{{ opcion.id }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm mt-2" onclick="agregarOpcion({{ forloop.counter0 }})">Agregar Opción</button>
+                            <input type="hidden" name="total_opciones_pregunta_{{ forloop.counter0 }}" value="{{ pregunta.respuestas.count }}">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Botón para agregar preguntas -->
+            <div class="text-center mb-4">
+                <button type="button" class="btn btn-primary" onclick="agregarPregunta()">Agregar Pregunta</button>
+                <input type="hidden" name="total_preguntas" id="total_preguntas" value="{{ preguntas.count }}">
+            </div>
+
+            <!-- Botón para guardar cambios -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Tus scripts originales -->
+    <script>
+        let preguntaIndex = 0;  // Índice para las preguntas
+    
+        function agregarPregunta() {
+            const preguntasContainer = document.getElementById('preguntas-container');
+    
+            // Crear contenedor para una nueva pregunta
+            const nuevaPregunta = document.createElement('div');
+            nuevaPregunta.setAttribute('id', `pregunta_${preguntaIndex}`);
+            nuevaPregunta.classList.add('pregunta');
+            nuevaPregunta.innerHTML = `
+                <h3 class="h6">Pregunta ${preguntaIndex + 1}</h3>
+                <label for="pregunta_${preguntaIndex}" class="form-label">Texto de la pregunta:</label>
+                <input type="text" class="form-control" name="pregunta_${preguntaIndex}" id="pregunta_${preguntaIndex}" required>
+                <div id="opciones_pregunta_${preguntaIndex}" class="mt-3">
+                    <h4 class="h6">Opciones</h4>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm mt-2" onclick="agregarOpcion(${preguntaIndex})">Agregar Opción</button>
+                <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="borrarUltimaOpcion(${preguntaIndex})">Borrar Última Opción</button>
+                <input type="hidden" name="total_opciones_pregunta_${preguntaIndex}" id="total_opciones_pregunta_${preguntaIndex}" value="0">
+            `;
+            preguntasContainer.appendChild(nuevaPregunta);
+            preguntaIndex++;
+            document.getElementById('total_preguntas').value = preguntaIndex;
+        }
+    
+        function agregarOpcion(preguntaId) {
+            const opcionesContainer = document.getElementById(`opciones_pregunta_${preguntaId}`);
+            const totalOpcionesInput = document.getElementById(`total_opciones_pregunta_${preguntaId}`);
+            const opcionIndex = parseInt(totalOpcionesInput.value);
+    
+            // Crear nueva opción
+            const nuevaOpcion = document.createElement('div');
+            nuevaOpcion.setAttribute('id', `pregunta_${preguntaId}_opcion_${opcionIndex}`);
+            nuevaOpcion.classList.add('mb-2');
+            nuevaOpcion.innerHTML = `
+                <label for="pregunta_${preguntaId}_opcion_${opcionIndex}" class="form-label">Opción ${opcionIndex + 1}:</label>
+                <input type="text" class="form-control" name="pregunta_${preguntaId}_opcion_${opcionIndex}" id="pregunta_${preguntaId}_opcion_${opcionIndex}" required>
+            `;
+            opcionesContainer.appendChild(nuevaOpcion);
+    
+            // Incrementar el contador de opciones
+            totalOpcionesInput.value = opcionIndex + 1;
+        }
+    </script>
+</body>
+</html>
+
+{% endblock %}
+
+

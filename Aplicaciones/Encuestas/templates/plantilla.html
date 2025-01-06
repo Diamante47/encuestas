@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Mi Aplicación{% endblock %}</title>
+    <style>
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        nav ul li a:hover {
+            background-color: #575757;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú de navegación -->
+    <nav>
+        <ul>
+            <li><a href="{% url 'crear_encuesta' %}">Crear Encuesta</a></li>
+            <li><a href="{% url 'editar_encuesta_list' %}">Mis Encuestas</a></li>
+            <li><a href="{% url 'seleccionar_encuesta' %}">Ver Resultados</a></li>
+            <li><a href="{% url 'lista_encuestas' %}">Salir</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div>
+        {% block content %}
+        <!-- Aquí irá el contenido específico de cada página -->
+        {% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+{% extends "plantilla.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Encuestas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border: 1px solid #d6d6d6;
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+        .card-header {
+            background-color: #e9ecef;
+            font-weight: bold;
+            color: #495057;
+        }
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-group-item strong {
+            color: #343a40;
+        }
+        .btn-edit {
+            color: #007bff;
+        }
+        .btn-delete {
+            color: #dc3545;
+        }
+        .btn-delete:hover {
+            color: #a71d2a;
+        }
+        .btn-share {
+            color: #28a745;
+        }
+        .btn-share:hover {
+            color: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Listado de Encuestas
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for encuesta in encuestas %}
+                        <li class="list-group-item">
+                            <div>
+                                <strong>{{ encuesta.titulo }}</strong> - {{ encuesta.descripcion }}
+                            </div>
+                            <div>
+                                <a href="{% url 'editar_encuesta_form' encuesta.id %}" class="btn btn-link btn-edit">Editar</a>
+                                <a href="{% url 'borrar_encuesta' encuesta.id %}" class="btn btn-link btn-delete" onclick="return confirm('¿Estás seguro de que deseas borrar esta encuesta?');">Borrar</a>
+                                <button 
+                                    class="btn btn-link btn-share" 
+                                    onclick="shareSurvey('{{ request.scheme }}://{{ request.get_host }}{% url 'compartir_encuesta' encuesta.id %}')">
+                                    Compartir
+                                </button>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted">No hay encuestas disponibles.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function shareSurvey(link) {
+            const message = `¡Responde esta encuesta! Aquí tienes el enlace: ${link}`;
+            const mailtoLink = `mailto:?subject=Responde esta encuesta&body=${encodeURIComponent(message)}`;
+            const whatsappLink = `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+            const shareOption = confirm("¿Quieres compartir por Gmail (Aceptar) o WhatsApp (Cancelar)?");
+            if (shareOption) {
+                window.location.href = mailtoLink;
+            } else {
+                window.open(whatsappLink, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+{% endblock %}

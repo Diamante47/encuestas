@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llenar Encuesta</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        .card {
+            border: 1px solid #d6d6d6;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .question-container {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .error-message {
+            font-size: 0.9rem;
+            color: red;
+            margin-top: 5px;
+        }
+        button[type="submit"] {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                {{ encuesta.titulo }}
+            </div>
+            <div class="card-body">
+                <p class="instructions">{{ encuesta.descripcion }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for pregunta in preguntas %}
+                        <div class="question-container">
+                            <h3>{{ forloop.counter }}. {{ pregunta.texto }}</h3>
+                            {% for respuesta in pregunta.respuestas.all %}
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="pregunta_{{ pregunta.id }}"
+                                        id="respuesta_{{ respuesta.id }}"
+                                        value="{{ respuesta.id }}"
+                                        required>
+                                    <label class="form-check-label" for="respuesta_{{ respuesta.id }}">
+                                        {{ respuesta.texto }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Enviar Respuestas</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function validateForm() {
+            let valid = true;
+            const questions = document.querySelectorAll('.question-container');
+            questions.forEach(question => {
+                const inputs = question.querySelectorAll('input[type="radio"]');
+                const isChecked = Array.from(inputs).some(input => input.checked);
+                const errorMsg = question.querySelector('.error-message');
+
+                if (!isChecked) {
+                    valid = false;
+                    question.style.border = "1px solid red";
+                    if (!errorMsg) {
+                        const error = document.createElement('p');
+                        error.className = "error-message text-danger";
+                        error.textContent = "Por favor, selecciona una respuesta.";
+                        question.appendChild(error);
+                    }
+                } else {
+                    question.style.border = "1px solid #dee2e6";
+                    if (errorMsg) {
+                        errorMsg.remove();
+                    }
+                }
+            });
+            if (!valid) {
+                alert('Por favor, responde todas las preguntas antes de enviar.');
+            }
+            return valid;
+        }
+
+        function confirmSubmit() {
+            return confirm("¿Estás seguro de que deseas enviar tus respuestas?");
+        }
+    </script>
+</body>
+</html>
+
+
